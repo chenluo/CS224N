@@ -1,0 +1,77 @@
+\documentclass[11pt, oneside]{article}   	% use "amsart" instead of "article" for AMSLaTeX format
+\usepackage{geometry}                		% See geometry.pdf to learn the layout options. There are lots.
+\geometry{letterpaper}                   		% ... or a4paper or a5paper or ... 
+%\geometry{landscape}                		% Activate for rotated page geometry
+%\usepackage[parfill]{parskip}    		% Activate to begin paragraphs with an empty line rather than an indent
+\usepackage{graphicx}				% Use pdf, png, jpg, or eps§ with pdflatex; use eps in DVI mode
+								% TeX will automatically convert eps --> pdf in pdflatex		
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{bm}
+
+
+
+%SetFonts
+
+%SetFonts
+
+
+\title{Assignment 1}
+\author{Chen Luo}
+%\date{}							% Activate to display a given date or no date
+
+\begin{document}
+\maketitle
+\section{Softmax}
+\subsection{a}
+\begin{align}
+softmax(\bm{x} + c) &=  \frac{e^{\bm{x+c}}}{\sum_{j = 1}^{d}{e^{x_j+c}}}\\
+&= \frac{e^{\bm{x}} e^c}{e^c \sum_{j=1}^{d}{e^{x_j}}} = softmax(\bm{x})
+\end{align}
+
+\section{NN Basic}
+\subsection{a}
+\begin{align}
+\frac{\partial\sigma(x)}{\partial x} &= -1(1+e^{-x})^{-2}\frac{\partial(1+e^{-x})}{\partial x}\\
+&= \frac{e^{-x}}{(1+e^{-x})^{2}}\\
+&= \frac{e^{-x}+1-1}{(1+e^{-x})^{2}}\\
+&= \sigma(x)-\sigma(x)^2
+\end{align}
+
+\subsection{b}
+\begin{align}
+CE(\bm{y}, \hat{\bm{y}}) &= -\sum_i y_i{\log (\hat{y_i})}\\
+\hat{\bm{y}} &= softmax(\bm{\theta}) = \frac{e^{\bm{\theta}}}{\sum_j{e^{\theta_j}}}\\
+\frac{\partial CE(\bm{y}, \hat{\bm{y}})}{\partial \bm\theta} &= -\frac{\partial \sum_i 1_{[y_i==1]}\left\{\log{e^{\theta_i}}-\log{\sum_j {e^{\theta_j}}}\right\}}{\partial \bm{\theta}}\\
+&= -\frac{\partial \bm{y}^T {\bm{\theta}} - log\sum_j e^{\theta_j}}{\partial \bm{\theta}}\\
+&= -\bm{y} + \frac{\log \bm{1}^T e^{\bm{\theta}}}{\partial \bm{\theta}}\\
+&= -\bm{y} + \frac{e^{\bm{\theta}}}{\bm{1}^T e^{\bm{\theta}}}\\
+&= -\bm{y} + softmax(\bm{\theta})\\
+&= \hat{\bm{y}} - \bm{y}
+\end{align}
+
+\subsection{c}
+\begin{align}
+J = CE(\bm{y}, \hat{\bm{y}}) &= CE(\bm{y}, softmax(\bm{h}\bm{W}_2+\bm{b}_2))\\
+&= CE(\bm{y}, softmax(\sigma(\bm{x}\bm{W}_1+\bm{b}_1)\bm{W}_2+\bm{b}_2))
+\end{align}
+
+\begin{align}
+\frac{\partial J}{\partial \bm{x}} &=\frac{\partial J}{\partial (\bm{h}\bm{W}_2+\bm{b}_2)}\frac{\partial (\bm{h}\bm{W}_2+\bm{b}_2)}{\partial \bm{h}}\frac{\partial \bm{h}}{\partial \bm{x}}\\
+&= (\hat{\bm{y}} - \bm{y})\bm{W}_2^T\sigma(\bm{x}\bm{W}_1+\bm{b}_1)\{\bm{1} - \sigma(\bm{x}\bm{W}_1+\bm{b}_1)\}^T\bm{W}_1^T
+\end{align}
+
+\subsection{d}
+\begin{align}
+\bm{W}_1&: D_x \times H\\
+\bm{b}_1&: 1 \times H\\
+\bm{W}_2 &: H \times D_y\\
+\bm{b}_2 &: 1 \times D_y\\
+&H(D_x+D_y+1)+D_y
+\end{align}
+
+
+
+
+
+\end{document}  
