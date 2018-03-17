@@ -33,7 +33,7 @@ def softmax(x):
         ### YOUR CODE HERE
 
         x = np.exp(x-np.reshape(np.max(x, 1), [x.shape[0], 1]))
-        x /= np.sum(x, 1)
+        x /= np.reshape(np.sum(x, 1), [x.shape[0], 1])
         ### END YOUR CODE
     else:
         # Vector

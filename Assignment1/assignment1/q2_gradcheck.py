@@ -37,7 +37,10 @@ def gradcheck_naive(f, x):
         # to test cost functions with built in randomness later.
 
         ### YOUR CODE HERE:
-        numgrad = (f(x[ix]+h)-f(x[ix]-h))/(2*h)
+        base = np.zeros(x.shape)
+        base[ix] = h
+        numgrad = np.subtract(f(np.add(x, base))[0], f(np.subtract(x, base))[0])/(2*h)
+
         ### END YOUR CODE
 
         # Compare gradients

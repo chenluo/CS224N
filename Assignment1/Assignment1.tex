@@ -56,9 +56,23 @@ J = CE(\bm{y}, \hat{\bm{y}}) &= CE(\bm{y}, softmax(\bm{h}\bm{W}_2+\bm{b}_2))\\
 &= CE(\bm{y}, softmax(\sigma(\bm{x}\bm{W}_1+\bm{b}_1)\bm{W}_2+\bm{b}_2))
 \end{align}
 
+Actually, 
+\begin{align}
+J = - \bm{y}_{1\times D_y} {\log (\bm{h}_{1\times H}\bm{W}_{H \times D_y}+\bm{b}_{1\times D_y})}^T
+\end{align}•
 \begin{align}
 \frac{\partial J}{\partial \bm{x}} &=\frac{\partial J}{\partial (\bm{h}\bm{W}_2+\bm{b}_2)}\frac{\partial (\bm{h}\bm{W}_2+\bm{b}_2)}{\partial \bm{h}}\frac{\partial \bm{h}}{\partial \bm{x}}\\
 &= (\hat{\bm{y}} - \bm{y})\bm{W}_2^T\sigma(\bm{x}\bm{W}_1+\bm{b}_1)\{\bm{1} - \sigma(\bm{x}\bm{W}_1+\bm{b}_1)\}^T\bm{W}_1^T
+\end{align},
+where $\frac{\partial (\bm{h}\bm{W}_2+\bm{b}_2)}{\partial \bm{h}}$ is Jaccobian matrix.
+
+Or, [TODO]
+\begin{align}
+d(\bm{h}\bm{W}_2+\bm{b}_2) &= d\bm{h}\bm{W}_2+\bm{h}d\bm{W}_2+d\bm{b}_2\\
+vec(d(\bm{h}\bm{W}_2+\bm{b}_2)) &= vec(d\bm{h}\bm{W}_2+\bm{h}d\bm{W}_2+d\bm{b}_2)\\
+&= vec(\bm{1}d\bm{h}\bm{W}_2+\bm{h}d\bm{W}_2\bm{I}+\bm{1}d\bm{b}_2\bm{I}) \to preparation for\\
+& vec(AXB) = (B^T\otimes A)vec(X)\\
+&= \bm{W}_2^T\otimes 1 vec(d\bm{h}) + \bm{I}\otimes \bm{h} vec(d\bm{W}_2) +\bm{I}\otimes 1 vec( d\bm{b}_2)
 \end{align}
 
 \subsection{d}
@@ -69,6 +83,26 @@ J = CE(\bm{y}, \hat{\bm{y}}) &= CE(\bm{y}, softmax(\bm{h}\bm{W}_2+\bm{b}_2))\\
 \bm{b}_2 &: 1 \times D_y\\
 &H(D_x+D_y+1)+D_y
 \end{align}
+
+\subsection{g}
+\begin{align}
+d J &= (\hat{\bm{y}} - \bm{y})^T d(\bm{h}\bm{W}_2+\bm{b}_2) = (\hat{\bm{y}} - \bm{y})^T (d\bm{h}\bm{W}_2+\bm{h}d\bm{W}_2+d\bm{b}_2)\\
+&= (\hat{\bm{y}} - \bm{y})^T d\bm{h}\bm{W}_2+(\hat{\bm{y}} - \bm{y})^T \bm{h}d\bm{W}_2+(\hat{\bm{y}} - \bm{y})^T d\bm{b}_2)\\
+&= trace((\hat{\bm{y}} - \bm{y})^T d\bm{h}\bm{W}_2+(\hat{\bm{y}} - \bm{y})^T \bm{h}d\bm{W}_2+(\hat{\bm{y}} - \bm{y})^T d\bm{b}_2))\\
+\frac{\partial J}{\partial \bm{W}_2} &= (\bm{W}_2(\hat{\bm{y}} - \bm{y})^T)^T\\
+&= \bm{h}^T(\hat{\bm{y}} - \bm{y})\\
+\frac{\partial J}{\partial \bm{b}_2} &= \hat{\bm{y}} - \bm{y}\\
+d \bm{h} &= d(\sigma(\bm{x}\bm{W}_1 + \bm{b}_1)) = {\sigma^\prime}(\bm{\cdot}) \odot (\bm{x}d\bm{W}_1 + d\bm{b}_1)\\
+d J &= trace( (\hat{\bm{y}}-\bm{y})^T \sigma^\prime (\cdot) \odot(\bm{x}d\bm{W}_1 +d \bm{b}_1)\bm{W}_2)\\
+&= trace(\bm{W}_2(\hat{\bm{y}}-\bm{y})^T \sigma^\prime (\cdot)\odot (\bm{x}d\bm{W}_1 +d \bm{b}_1))\\
+& Apply~law~of~trace~and~element-wise~product:\\
+& trace(A^T (B\odot C)) = trace((A \odot B)^T C) \\
+&= trace([(\hat{\bm{y}}-\bm{y})\bm{W}_2^T \odot \sigma^\prime(\cdot)]^T (\bm{x}d\bm{W}_1 +d \bm{b}_1) )\\
+\frac{\partial J}{\partial \bm{W}_1} &= \{[(\hat{\bm{y}}-\bm{y})\bm{W}_2^T \odot \sigma^\prime(\cdot)]^T \bm{x}\}^T\\
+&= \bm{x}^T [(\hat{\bm{y}}-\bm{y})\bm{W}_2^T \odot \sigma^\prime(\cdot)]\\
+\frac{\partial J}{\partial \bm{b}_1} &= [(\hat{\bm{y}}-\bm{y})\bm{W}_2^T \odot \sigma^\prime(\cdot)]\\
+\end{align}
+
 
 
 
