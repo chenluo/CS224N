@@ -100,9 +100,59 @@ d J &= trace( (\hat{\bm{y}}-\bm{y})^T \sigma^\prime (\cdot) \odot(\bm{x}d\bm{W}_
 &= trace([(\hat{\bm{y}}-\bm{y})\bm{W}_2^T \odot \sigma^\prime(\cdot)]^T (\bm{x}d\bm{W}_1 +d \bm{b}_1) )\\
 \frac{\partial J}{\partial \bm{W}_1} &= \{[(\hat{\bm{y}}-\bm{y})\bm{W}_2^T \odot \sigma^\prime(\cdot)]^T \bm{x}\}^T\\
 &= \bm{x}^T [(\hat{\bm{y}}-\bm{y})\bm{W}_2^T \odot \sigma^\prime(\cdot)]\\
-\frac{\partial J}{\partial \bm{b}_1} &= [(\hat{\bm{y}}-\bm{y})\bm{W}_2^T \odot \sigma^\prime(\cdot)]\\
+\frac{\partial J}{\partial \bm{b}_1} &= [(\hat{\bm{y}}-\bm{y})\bm{W}_2^T \odot \sigma^\prime(\cdot)]
 \end{align}
 
+\section{word2vec}
+Notice: $\bm\nu$ and $\bm\mu$ are column vectors. Previously, all vectors are row vectors. 
+\subsection{a}
+\begin{align}
+J_{softmax-CE}(o, \bm{\nu}_c, \bm{U}) &= CE(\bm{y}, \hat{\bm{y}})\\
+\hat{\bm{y}} &= softmax(\{\bm{U}_{\{d\times V\}}^T \times \bm{\nu}_{c\{d\times 1\}}\}^T)\\
+d CE(\cdot) &= (\hat{\bm{y}} - \bm{y}) d \bm{\nu}_c^T \bm{U}\\
+&= trace[(\hat{\bm{y}} - \bm{y}) d \bm{\nu}_c^T \bm{U}]\\
+&= trace[ \bm{U}(\hat{\bm{y}} - \bm{y})d \bm{\nu}_c^T]\\
+\frac{\partial CE(\cdot)}{\partial \bm{\nu}_c^T} &= (\hat{\bm{y}} - \bm{y})^T\bm{U}^T\\
+\frac{\partial CE(\cdot)}{\partial \bm{\nu}_c} &= \bm{U}(\hat{\bm{y}} - \bm{y})
+\end{align}
+
+\subsection{b}
+\begin{align}
+d CE(\cdot) &= (\hat{\bm{y}} - \bm{y}) \bm{\nu}_c^T d\bm{U}\\
+&= trace[(\hat{\bm{y}} - \bm{y}) \bm{\nu}_c^T d\bm{U}]\\
+\frac{\partial CE}{\partial \bm{U}} &= \bm{\nu}_c(\hat{\bm{y}} - \bm{y})^T
+\end{align}
+
+\subsection{c}
+Assume that for $\bm{\nu}_c$, $\bm{k}_{neg}$ is a row vector of $K$-hot (ensure $\bm{k}_{neg\{o\}} \neq 1$) and $\bm{k}$ is one-hot vector that $\bm{k}_o = 1$. Rewrite $J_{neg-sample}(\cdot)$ as follow,
+\begin{align}
+J_{neg-sample}(\cdot) &= -\log (\sigma(\bm{\nu}_c^T\bm{U}))\bm{k}^T - \log(\sigma(-\bm{\nu}_c^T\bm{U}))\bm{k}_{neg}^T\\
+&= -\log(\sigma(\bm{\nu}_c^T\bm{U}\bm{k}^T)) - \log(\sigma(-\bm{\nu}_c^T\bm{U}\bm{k}_{neg}^T))
+\end{align}
+In the last equation, we put all vectors into element-wise operator.
+\begin{align}
+d J_{neg-sample}(\cdot) &= \frac{\sigma(\bm{\nu}_c^T\bm{U}\bm{k}^T)(1-\sigma(\bm{\nu}_c^T\bm{U}\bm{k}^T))}{\sigma(\bm{\nu}_c^T\bm{U}\bm{k}^T)}\\
+\frac{\partial J_{neg-sample}(\cdot)}{\partial \bm\nu_c} &= 
+\end{align}
+TODO
+
+\begin{align}
+\frac{\partial J}{\partial \bm{\nu}_c} &= -\bm\mu_o\frac{\sigma(\bm{\mu}_o^T\bm\nu_c)(1-\sigma(\bm{\mu}_o^T\bm\nu_c))}{\sigma(\bm{\mu}_o^T\bm\nu_c)} + \sum_{k = 1}^K \bm\mu_k(1 - \sigma(-\bm\mu_k^T\bm\nu_c))\\
+&= -\bm\mu_o(1-\sigma(\bm{\mu}_o^T\bm\nu_c)) + \sum_{k = 1}^K \bm\mu_k(1 - (1-\sigma(\bm\mu_k^T\bm\nu_c))\\
+&= -\bm\mu_o(1-\sigma(\bm{\mu}_o^T\bm\nu_c)) +\sum_{k = 1}^K \bm\mu_k(\sigma(\bm\mu_k^T\bm\nu_c))
+\end{align}
+\begin{align}
+d J(\cdot) &= - \frac{d(\sigma(\cdot))}{\sigma(\cdot)} +\sum_{k = 1}^{K}(1 - \sigma(-\bm\mu_k^T\bm\nu_c))d\bm\mu_k^T\bm\nu_c\\
+&=- trace({(1-\sigma(\bm\mu_o^T \bm\nu_c)) d \bm\mu_o^T \bm\nu_c}) \\
+&= trace(\bm\nu_c(\sigma(\bm\mu_o^T \bm\nu_c)-1)d \bm\mu_o^T)\\
+\frac{\partial J}{\partial \bm{\mu}_o} &= \bm\nu_c(\sigma(\bm\mu_o^T \bm\nu_c)-1)\\
+\end{align}
+\begin{align}
+\frac{\partial J}{\partial \bm{\mu}_k} &= \bm\nu_c\sigma(\bm\mu_k^T\bm\nu_c), for~k = [1, 2, ..., K]
+\end{align}
+
+Computation efficiency of negtive-sampling loss, speed up ratio is approximately
+$$\frac{V}{K+1}$$
 
 
 
