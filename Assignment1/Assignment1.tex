@@ -154,6 +154,31 @@ d J(\cdot) &= - \frac{d(\sigma(\cdot))}{\sigma(\cdot)} +\sum_{k = 1}^{K}(1 - \si
 Computation efficiency of negtive-sampling loss, speed up ratio is approximately
 $$\frac{V}{K+1}$$
 
+\subsection{d}
+For skip-gram: 
+
+As the definition of word-vector, there are no items of $\bm\nu_k$ where $k \neq c$ in cost function $J(o, \bm\nu_c, \bm{U})$ or $F(\cdot)$.
+
+\begin{align}
+\frac{\partial J_{skip-gram}(\omega_{t-m},...\omega_{t+m})}{\partial \bm\nu_k} &= \bm{0}, for~any~k\neq c\\
+\end{align}
+For the remaining parts is only applying the gradients derived by previous questions into the sum operator. The inner parts depend on the specified definition of $F(o, c)$.
+
+For CBOW:
+
+If softmax-cross-entropy cost, 
+\begin{align}
+p(\omega_t, \hat{\bm{\nu}}) &= \frac{\exp(\bm\mu_{\omega_t}^T \sum_{-m\leq j\leq m, j\neq 0}\bm\nu_{\omega_j})}{\sum_{v = 1}^V\exp(\bm\mu_v^T \sum_{-m\leq j\leq m, j\neq 0}\bm\nu_{\omega_j})}\\
+J_{CBOW} = F(\omega_t, \hat{\bm{\nu}}) &= CE(\bm{y}, \hat{\bm{y}} = softmax(\bm{U}_{\{d\times V\}}^T \times \hat{\bm{\nu}}_{\{d\times 1\}}^T))\\
+d J_{CBOW} &= \bm{U}(\hat{\bm{y}} - \bm{y}) d \hat{\bm{\nu}}\\
+&= \sum_{-m\leq j\leq m, j\neq 0} \bm{U}(\hat{\bm{y}} - \bm{y}) d \bm\nu_{\omega_j}
+\end{align}
+
+
+
+
+
+
 
 
 

@@ -49,6 +49,7 @@ def forward_backward_prop(X, labels, params, dimensions):
 
     ### YOUR CODE HERE: backward propagation
     gradW2 = np.matmul(h.T, delta_y)
+    # Notice: np.sum(\cdot) may reduce the dimension of shape.
     gradb2 = np.sum(delta_y, 0, keepdims=True)
     dh = np.matmul(delta_y, W2.T)
     temp = dh * sigmoid_grad(h)
