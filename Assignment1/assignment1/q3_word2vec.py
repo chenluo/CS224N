@@ -68,6 +68,7 @@ def softmaxCostAndGradient(predicted, target, outputVectors, dataset):
     gradUT = np.dot(predicted, (softmax_vector - labels).T)
     gradOther = np.zeros([outputVectors.shape[0], outputVectors.shape[1]-1])
     grad = np.concatenate(gradUT[:], gradOther[:])
+    
     ### END YOUR CODE
 
     return cost, gradPred, grad
