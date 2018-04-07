@@ -60,15 +60,16 @@ def softmaxCostAndGradient(predicted, target, outputVectors, dataset):
 
     ### YOUR CODE HERE
     softmax_vector = softmax(np.dot(outputVectors, predicted))
-    cost = -1*softmax_vector[target]
-    labels = np.zeros([outputVectors.shape[1], 1])
+    cost = -1*np.log(softmax_vector[target])
+    labels = np.zeros([outputVectors.shape[0], 1])
     labels[target] = 1
+    softmax_vector = np.atleast_2d(softmax_vector).T
     gradPred = np.dot(outputVectors.T, (softmax_vector - labels))
     # U with size of V \times d here. In assignment it is d \times V
+    predicted = np.atleast_2d(predicted).T
     gradUT = np.dot(predicted, (softmax_vector - labels).T)
-    gradOther = np.zeros([outputVectors.shape[0], outputVectors.shape[1]-1])
-    grad = np.concatenate(gradUT[:], gradOther[:])
-    
+    grad = gradUT.T
+
     ### END YOUR CODE
 
     return cost, gradPred, grad
@@ -115,8 +116,7 @@ def negSamplingCostAndGradient(predicted, target, outputVectors, dataset,
 
     gradUT = np.zeros(outputVectors.shape)
     gradUT[indices[1:], :] = np.dot(uKvc, predicted.T)
-    gradOther = np.zeros([outputVectors.shape[0], outputVectors.shape[1] - 1])
-    grad = np.concatenate(gradUT[:], gradOther[:])
+    grad = gradUT.T
     ### END YOUR CODE
 
     return cost, gradPred, grad
@@ -151,7 +151,12 @@ def skipgram(currentWord, C, contextWords, tokens, inputVectors, outputVectors,
     gradOut = np.zeros(outputVectors.shape)
 
     ### YOUR CODE HERE
-    raise NotImplementedError
+    for contextWord in contextWords:
+        [tempCost, tempGradIn, tempGradOut] = word2vecCostAndGradient(inputVectors[tokens[currentWord], :], tokens[contextWord], outputVectors, dataset)
+        cost += tempCost
+        gradIn[tokens[currentWord], :] += tempGradIn.flatten()
+        gradOut += tempGradOut
+
     ### END YOUR CODE
 
     return cost, gradIn, gradOut
@@ -175,7 +180,6 @@ def cbow(currentWord, C, contextWords, tokens, inputVectors, outputVectors,
     gradOut = np.zeros(outputVectors.shape)
 
     ### YOUR CODE HERE
-    raise NotImplementedError
     ### END YOUR CODE
 
     return cost, gradIn, gradOut
@@ -222,7 +226,7 @@ def test_word2vec():
     def getRandomContext(C):
         tokens = ["a", "b", "c", "d", "e"]
         return tokens[random.randint(0, 4)], \
-               [tokens[random.randint(0, 4)] for i in xrange(2 * C)]
+               [tokens[random.randint(0, 4)] for i in range(2 * C)]
 
     dataset.sampleTokenIdx = dummySampleTokenIdx
     dataset.getRandomContext = getRandomContext
