@@ -39,7 +39,12 @@ def gradcheck_naive(f, x):
         ### YOUR CODE HERE:
         base = np.zeros(x.shape)
         base[ix] = h
-        numgrad = np.subtract(f(np.add(x, base))[0], f(np.subtract(x, base))[0])/(2*h)
+        random.setstate(rndstate)
+        fx_1, _ = f(np.add(x, base))
+        random.setstate(rndstate)
+        fx_2, _ = f(np.subtract(x, base))
+
+        numgrad = np.subtract(fx_1, fx_2)/(2*h)
 
         ### END YOUR CODE
 
