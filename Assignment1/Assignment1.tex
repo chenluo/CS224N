@@ -173,6 +173,7 @@ J_{CBOW} = F(\omega_t, \hat{\bm{\nu}}) &= CE(\bm{y}, \hat{\bm{y}} = softmax(\bm{
 d J_{CBOW} &= \bm{U}(\hat{\bm{y}} - \bm{y}) d \hat{\bm{\nu}}\\
 &= \sum_{-m\leq j\leq m, j\neq 0} \bm{U}(\hat{\bm{y}} - \bm{y}) d \bm\nu_{\omega_j}
 \end{align}
+In the context window, $\bm\nu_{\omega_j}$ may be duplicated. All of the gradients of $\bm\nu_{\omega_j}$ is $\bm{U}(\hat{\bm{y}} - \bm{y})$ times \textit{occurence} of $\omega_j$
 
 
 

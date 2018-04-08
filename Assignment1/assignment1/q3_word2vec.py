@@ -6,6 +6,7 @@ import random
 from q1_softmax import softmax
 from q2_gradcheck import gradcheck_naive
 from q2_sigmoid import sigmoid, sigmoid_grad
+from functools import reduce
 
 
 def normalizeRows(x):
@@ -117,8 +118,15 @@ def negSamplingCostAndGradient(predicted, target, outputVectors, dataset,
     gradPred = -1 * outputVectors[target, :].T * (1 - sigma_uv) + np.dot(sample.T, sigmoid(uKvc))
 
     gradUT = np.zeros(outputVectors.shape)
-    gradUT[indices[1:], :] = np.dot(uKvc, predicted.T)
-    grad = gradUT.T
+    # naive impl by for loop
+    for index in indices[1:]:
+        gradUT[index, :] += predicted * sigmoid(np.dot(outputVectors[index, :].T, predicted))
+
+    gradUT[indices[0], :] = predicted * (sigma_uv - 1)
+    # samples may include duplicated indices!!
+    # gradUT[indices[1:], :] = np.dot(np.atleast_2d(uKvc).T, np.atleast_2d(predicted))
+    # gradUT[indices[0], :] = predicted*(sigma_uv-1)
+    grad = gradUT
     ### END YOUR CODE
 
     return cost, gradPred, grad
@@ -159,9 +167,6 @@ def skipgram(currentWord, C, contextWords, tokens, inputVectors, outputVectors,
         cost += tempCost
         gradIn[tokens[currentWord]] += tempGradIn.flatten()
         gradOut += tempGradOut
-    #cost /= len(contextWords)
-    #gradOut /= len(contextWords)
-    #gradIn /= len(contextWords)
 
     ### END YOUR CODE
 
@@ -186,6 +191,15 @@ def cbow(currentWord, C, contextWords, tokens, inputVectors, outputVectors,
     gradOut = np.zeros(outputVectors.shape)
 
     ### YOUR CODE HERE
+    hatNu = reduce(lambda word_prev, word_next: word_prev + word_next,
+                   map(lambda word: inputVectors[tokens[word]], contextWords))
+    [tempCost, tempGradIn, tempGradOut] = word2vecCostAndGradient(hatNu,
+                                                                  tokens[currentWord], outputVectors, dataset)
+    cost += tempCost
+    for word in contextWords:
+        gradIn[tokens[word], :] += tempGradIn.flatten()
+    gradOut += tempGradOut
+
     ### END YOUR CODE
 
     return cost, gradIn, gradOut
@@ -201,7 +215,7 @@ def word2vec_sgd_wrapper(word2vecModel, tokens, wordVectors, dataset, C,
     cost = 0.0
     grad = np.zeros(wordVectors.shape)
     N = wordVectors.shape[0]
-    n = np.int(N/2)
+    n = np.int(N / 2)
     inputVectors = wordVectors[:n, :]
     outputVectors = wordVectors[n:, :]
     for i in range(batchsize):
