@@ -63,8 +63,7 @@ def getRegularizationValues():
     """
     values = None   # Assign a list of floats in the block below
     ### YOUR CODE HERE
-    values = 2 ** np.arange(-5,0)
-    values = [values, 0]
+    values = np.arange(0,1,0.05)
     ### END YOUR CODE
     return sorted(values)
 
